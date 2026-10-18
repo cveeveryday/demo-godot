@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://shots/cathedral/cathedral.gd" id="1"]
+
+[node name="Cathedral" type="Node3D" node_paths=PackedStringArray("camera")]
+script = ExtResource("1")
+duration = 6.5
+camera = NodePath("Camera")
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 1.5, 3.2)
+fov = 50.0
+near = 0.05
+far = 120.0
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]

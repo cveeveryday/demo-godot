@@ -1,0 +1,79 @@
+extends SceneTree
+# usage: godot --headless --path . -s decimate.gd -- <gltf res path> <out .res> <target_tris>
+func _find_mesh(n: Node) -> MeshInstance3D:
+	if n is MeshInstance3D: return n
+	for c in n.get_children():
+		var r := _find_mesh(c)
+		if r: return r
+	return null
+
+func _init() -> void:
+	var a := OS.get_cmdline_user_args()
+	var src: String = a[0]; var out: String = a[1]; var target := int(a[2])
+	var scene: Node = (load(src) as PackedScene).instantiate()
+	var mi := _find_mesh(scene)
+	var mesh: ArrayMesh = mi.mesh
+	var arrays := mesh.surface_get_arrays(0)
+	var surf := RenderingServer.mesh_get_surface(mesh.get_rid(), 0)
+	var vcount: int = surf["vertex_count"]
+	var full_idx: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+	print("verts ", vcount, " tris ", full_idx.size() / 3, " lods ", surf.get("lods", []).size())
+	var lods: Array = []  # [tris, edge, PackedInt32Array]
+	for l in surf.get("lods", []):
+		var bytes: PackedByteArray = l["index_data"]
+		var idx: PackedInt32Array
+		if vcount > 65535 or bytes.size() == 0:
+			idx = bytes.to_int32_array()
+		else:
+			idx = PackedInt32Array()
+			var s := bytes.to_int32_array() # placeholder
+			idx.resize(bytes.size() / 2)
+			for i in idx.size(): idx[i] = bytes.decode_u16(i * 2)
+		lods.append([idx.size() / 3, l["edge_length"], idx])
+		print("  lod tris ", idx.size() / 3, " edge ", l["edge_length"])
+	# pick first lod with tris <= target
+	var base_i := -1
+	for i in lods.size():
+		if lods[i][0] <= target:
+			base_i = i; break
+	var base_idx: PackedInt32Array = full_idx if base_i < 0 else lods[base_i][2]
+	# compact vertices
+	var remap := PackedInt32Array(); remap.resize(vcount); remap.fill(-1)
+	var order := PackedInt32Array()
+	for v in base_idx:
+		if remap[v] < 0:
+			remap[v] = order.size(); order.append(v)
+	var na := []; na.resize(Mesh.ARRAY_MAX)
+	for k in [Mesh.ARRAY_VERTEX, Mesh.ARRAY_NORMAL, Mesh.ARRAY_TANGENT, Mesh.ARRAY_TEX_UV]:
+		var src_arr = arrays[k]
+		if src_arr == null: continue
+		var comp := 1
+		if k == Mesh.ARRAY_TANGENT: comp = 4
+		var dst
+		if k == Mesh.ARRAY_VERTEX or k == Mesh.ARRAY_NORMAL: dst = PackedVector3Array()
+		elif k == Mesh.ARRAY_TANGENT: dst = PackedFloat32Array()
+		else: dst = PackedVector2Array()
+		dst.resize(order.size() * comp)
+		for i in order.size():
+			for c in comp:
+				dst[i * comp + c] = src_arr[order[i] * comp + c]
+		na[k] = dst
+	var ni := PackedInt32Array(); ni.resize(base_idx.size())
+	for i in base_idx.size(): ni[i] = remap[base_idx[i]]
+	na[Mesh.ARRAY_INDEX] = ni
+	var lod_dict := {}
+	if base_i >= 0:
+		for j in range(base_i + 1, lods.size()):
+			var li: PackedInt32Array = lods[j][2]
+			var ok := true
+			var nli := PackedInt32Array(); nli.resize(li.size())
+			for i in li.size():
+				var r := remap[li[i]]
+				if r < 0: ok = false; break
+				nli[i] = r
+			if ok: lod_dict[lods[j][1]] = nli
+	var m := ArrayMesh.new()
+	m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, na, [], lod_dict)
+	print("out verts ", order.size(), " tris ", ni.size() / 3, " lods kept ", lod_dict.size(), " aabb ", m.get_aabb())
+	ResourceSaver.save(m, out, ResourceSaver.FLAG_COMPRESS)
+	quit()

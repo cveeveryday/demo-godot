@@ -1,0 +1,173 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://shots/macro/macro.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/macro/hdri/artist_workshop_1k.hdr" id="2_hdri"]
+[ext_resource type="Texture2D" path="res://assets/macro/textures/wood_table_worn/wood_table_worn_diff_2k.jpg" id="3_diff"]
+[ext_resource type="Texture2D" path="res://assets/macro/textures/wood_table_worn/wood_table_worn_nor_gl_2k.jpg" id="4_nor"]
+[ext_resource type="Texture2D" path="res://assets/macro/textures/wood_table_worn/wood_table_worn_arm_2k.jpg" id="5_arm"]
+[ext_resource type="Shader" path="res://shots/macro/dust.gdshader" id="6_dust"]
+
+[sub_resource type="PanoramaSkyMaterial" id="sky_mat"]
+panorama = ExtResource("2_hdri")
+energy_multiplier = 0.16
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+radiance_size = 2
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+sky_rotation = Vector3(0, 1.5, 0)
+ambient_light_source = 3
+reflected_light_source = 2
+tonemap_mode = 4
+tonemap_white = 6.0
+ssao_enabled = true
+ssao_radius = 0.06
+ssao_intensity = 1.6
+ssao_power = 1.3
+ssao_detail = 0.8
+ssao_light_affect = 0.15
+glow_enabled = true
+glow_intensity = 0.35
+glow_bloom = 0.02
+glow_hdr_threshold = 1.5
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.07
+volumetric_fog_albedo = Color(0.9, 0.85, 0.8, 1)
+volumetric_fog_anisotropy = 0.6
+volumetric_fog_length = 3.0
+volumetric_fog_ambient_inject = 0.0
+volumetric_fog_sky_affect = 0.0
+
+[sub_resource type="CameraAttributesPractical" id="camattr"]
+dof_blur_far_enabled = true
+dof_blur_far_distance = 0.4
+dof_blur_far_transition = 0.2
+dof_blur_near_enabled = true
+dof_blur_near_distance = 0.2
+dof_blur_near_transition = 0.05
+dof_blur_amount = 0.18
+
+[sub_resource type="StandardMaterial3D" id="table_mat"]
+albedo_texture = ExtResource("3_diff")
+albedo_color = Color(0.92, 0.86, 0.8, 1)
+metallic_texture = ExtResource("5_arm")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("5_arm")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_texture = ExtResource("4_nor")
+normal_scale = 1.0
+ao_enabled = true
+ao_texture = ExtResource("5_arm")
+ao_light_affect = 0.3
+clearcoat_enabled = true
+clearcoat = 0.35
+clearcoat_roughness = 0.35
+uv1_scale = Vector3(2.2, 2.2, 2.2)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="BoxMesh" id="table_mesh"]
+material = SubResource("table_mat")
+size = Vector3(1.8, 0.05, 1.2)
+
+[sub_resource type="BoxMesh" id="wall_side"]
+size = Vector3(0.05, 3.0, 1.5)
+
+[sub_resource type="BoxMesh" id="wall_right"]
+size = Vector3(0.05, 3.0, 2.05)
+
+[sub_resource type="BoxMesh" id="wall_tb"]
+size = Vector3(0.05, 0.75, 1.1)
+
+[sub_resource type="BoxMesh" id="mullion"]
+size = Vector3(0.05, 1.8, 0.03)
+
+[sub_resource type="ShaderMaterial" id="dust_mat"]
+shader = ExtResource("6_dust")
+
+[node name="Macro" type="Node3D" node_paths=PackedStringArray("camera")]
+script = ExtResource("1_script")
+camera = NodePath("Camera")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0.25)
+attributes = SubResource("camattr")
+fov = 26.0
+near = 0.005
+far = 30.0
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+light_color = Color(1, 0.84, 0.66, 1)
+light_energy = 9.0
+light_angular_distance = 1.2
+light_volumetric_fog_energy = 1.0
+shadow_enabled = true
+shadow_bias = 0.02
+shadow_normal_bias = 0.6
+shadow_blur = 1.0
+directional_shadow_mode = 1
+directional_shadow_max_distance = 2.5
+
+[node name="FlameLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.495, -0.5)
+light_color = Color(1, 0.62, 0.3, 1)
+light_energy = 0.35
+light_size = 0.02
+light_volumetric_fog_energy = 0.0
+omni_range = 1.5
+omni_attenuation = 2.0
+
+[node name="ReflectionProbe" type="ReflectionProbe" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.2)
+size = Vector3(1.8, 0.8, 1.2)
+origin_offset = Vector3(0, -0.15, 0.25)
+box_projection = true
+interior = false
+enable_shadows = true
+update_mode = 0
+
+[node name="Table" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.025, -0.25)
+mesh = SubResource("table_mesh")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="WindowWall" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0, 0)
+
+[node name="Left" type="MeshInstance3D" parent="WindowWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.95)
+cast_shadow = 3
+mesh = SubResource("wall_side")
+
+[node name="Right" type="MeshInstance3D" parent="WindowWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.925)
+cast_shadow = 3
+mesh = SubResource("wall_right")
+
+[node name="Bottom" type="MeshInstance3D" parent="WindowWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.175, -0.65)
+cast_shadow = 3
+mesh = SubResource("wall_tb")
+
+[node name="Top" type="MeshInstance3D" parent="WindowWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.975, -0.65)
+cast_shadow = 3
+mesh = SubResource("wall_tb")
+
+[node name="Mullion" type="MeshInstance3D" parent="WindowWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -0.70)
+cast_shadow = 3
+mesh = SubResource("mullion")
+
+[node name="Dust" type="MultiMeshInstance3D" parent="."]
+cast_shadow = 0
+material_override = SubResource("dust_mat")

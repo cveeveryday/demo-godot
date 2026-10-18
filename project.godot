@@ -1,0 +1,73 @@
+; Engine configuration file.
+; Owned by the platform agent. Request changes via NOTES-<name>.md at repo root.
+; Desktop keys = full quality. `.mobile` / `.android` feature overrides tune the
+; Steam Frame (Snapdragon 8 Gen 3 / Adreno 750) APK. shared/quality.gd refines at runtime.
+config_version=5
+
+[application]
+
+config/name="Frame Demo 2026"
+config/description="20 second realtime realism demo, 3DMark-style"
+run/main_scene="res://director/main.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
+config/icon="res://shared/icon.svg"
+boot_splash/bg_color=Color(0, 0, 0, 1)
+boot_splash/show_image=false
+
+[autoload]
+
+Quality="*res://shared/quality.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+window/handheld/orientation=0
+window/energy_saving/keep_screen_on=true
+window/vsync/vsync_mode=1
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
+renderer/rendering_method.android="forward_plus"
+rendering_device/driver.android="vulkan"
+textures/vram_compression/import_etc2_astc=true
+textures/vram_compression/import_s3tc_bptc=true
+textures/default_filters/anisotropic_filtering_level=4
+textures/default_filters/anisotropic_filtering_level.android=2
+anti_aliasing/quality/use_taa=true
+anti_aliasing/quality/use_debanding=true
+scaling_3d/mode=0
+scaling_3d/scale=1.0
+scaling_3d/mode.android=1
+scaling_3d/scale.android=0.75
+scaling_3d/fsr_sharpness=0.2
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)
+lights_and_shadows/directional_shadow/size=4096
+lights_and_shadows/directional_shadow/size.mobile=2048
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality.mobile=2
+lights_and_shadows/positional_shadow/atlas_size=4096
+lights_and_shadows/positional_shadow/atlas_size.mobile=2048
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality=3
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality.mobile=2
+environment/ssao/quality=3
+environment/ssao/quality.android=1
+environment/ssao/half_size=false
+environment/ssao/half_size.android=true
+environment/ssil/quality=2
+environment/ssil/quality.android=1
+environment/ssil/half_size=true
+environment/screen_space_reflection/half_size=false
+environment/screen_space_reflection/half_size.android=true
+environment/volumetric_fog/volume_size=64
+environment/volumetric_fog/volume_depth=64
+environment/volumetric_fog/volume_size.android=48
+environment/volumetric_fog/volume_depth.android=48
+environment/subsurface_scattering/subsurface_scattering_quality=2
+environment/subsurface_scattering/subsurface_scattering_quality.android=1
+reflections/reflection_atlas/reflection_size=256
+reflections/reflection_atlas/reflection_size.mobile=256
+mesh_lod/lod_change/threshold_pixels=1.0
+mesh_lod/lod_change/threshold_pixels.android=1.5

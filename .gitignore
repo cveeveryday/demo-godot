@@ -1,0 +1,9 @@
+.godot/
+build/
+*.apk
+*.idsig
+
+# signing keys / local secrets
+*.keystore
+*.jks
+.env

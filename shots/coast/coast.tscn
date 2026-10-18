@@ -1,0 +1,332 @@
+[gd_scene load_steps=40 format=3]
+
+[ext_resource type="Script" path="res://shots/coast/coast.gd" id="1"]
+[ext_resource type="Shader" path="res://shots/coast/water.gdshader" id="2"]
+[ext_resource type="Shader" path="res://shots/coast/rock.gdshader" id="3"]
+[ext_resource type="Shader" path="res://shots/coast/sky.gdshader" id="4"]
+[ext_resource type="Texture2D" path="res://assets/coast/hdri/belfast_sunset_puresky_2k.hdr" id="5"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/ocean_nrm.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/ocean_height.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/foam.png" id="8"]
+[ext_resource type="ArrayMesh" path="res://assets/coast/models/cliff04.res" id="9"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/coastal_cliff_04_diff_2k.jpg" id="10"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/coastal_cliff_04_arm_2k.jpg" id="11"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/coastal_cliff_04_nor_gl_2k.jpg" id="12"]
+[ext_resource type="ArrayMesh" path="res://assets/coast/models/rocks05.res" id="13"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/coast_rocks_05_diff_2k.jpg" id="14"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/coast_rocks_05_arm_2k.jpg" id="15"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/coast_rocks_05_nor_gl_2k.jpg" id="16"]
+[ext_resource type="ArrayMesh" path="res://assets/coast/models/landrocks02.res" id="17"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/coast_land_rocks_02_diff_2k.jpg" id="18"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/coast_land_rocks_02_arm_2k.jpg" id="19"]
+[ext_resource type="Texture2D" path="res://assets/coast/textures/coast_land_rocks_02_nor_gl_2k.jpg" id="20"]
+
+[sub_resource type="ShaderMaterial" id="skymat"]
+shader = ExtResource("4")
+shader_parameter/panorama = ExtResource("5")
+shader_parameter/u_offset = 0.18783
+shader_parameter/exposure = 0.85
+shader_parameter/sun_dir = Vector3(-0.49966, 0.03664, -0.86544)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("skymat")
+radiance_size = 3
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 3
+ambient_light_sky_contribution = 1.0
+reflected_light_source = 2
+tonemap_mode = 4
+tonemap_exposure = 0.2
+tonemap_white = 8.0
+ssao_enabled = true
+ssao_radius = 2.0
+ssao_intensity = 1.5
+glow_enabled = true
+glow_intensity = 0.35
+glow_strength = 0.9
+glow_bloom = 0.04
+glow_blend_mode = 1
+glow_hdr_threshold = 1.2
+fog_enabled = true
+fog_mode = 0
+fog_light_color = Color(0.62, 0.55, 0.52, 1)
+fog_light_energy = 1.0
+fog_sun_scatter = 0.35
+fog_density = 0.0006
+fog_aerial_perspective = 0.75
+fog_sky_affect = 0.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0015
+volumetric_fog_albedo = Color(0.95, 0.9, 0.85, 1)
+volumetric_fog_anisotropy = 0.7
+volumetric_fog_length = 220.0
+volumetric_fog_detail_spread = 2.0
+volumetric_fog_sky_affect = 0.0
+adjustment_enabled = true
+adjustment_contrast = 1.1
+adjustment_saturation = 1.05
+
+[sub_resource type="Environment" id="env_refl"]
+background_mode = 1
+background_color = Color(0, 0, 0, 0)
+sky = SubResource("sky")
+ambient_light_source = 3
+reflected_light_source = 2
+tonemap_mode = 0
+tonemap_exposure = 1.0
+fog_enabled = true
+fog_mode = 0
+fog_light_color = Color(0.62, 0.55, 0.52, 1)
+fog_sun_scatter = 0.35
+fog_density = 0.0016
+fog_aerial_perspective = 0.75
+fog_sky_affect = 0.0
+
+[sub_resource type="ShaderMaterial" id="watermat"]
+render_priority = 0
+shader = ExtResource("2")
+shader_parameter/detail_nrm = ExtResource("6")
+shader_parameter/detail_height = ExtResource("7")
+shader_parameter/foam_tex = ExtResource("8")
+shader_parameter/sky_pano = ExtResource("5")
+shader_parameter/sky_u_offset = 0.18783
+shader_parameter/sky_sun_dir = Vector3(-0.49966, 0.03664, -0.86544)
+
+[sub_resource type="ShaderMaterial" id="rock_cliff04_0p95_0p92_0p88"]
+render_priority = 0
+shader = ExtResource("3")
+shader_parameter/albedo_tex = ExtResource("10")
+shader_parameter/arm_tex = ExtResource("11")
+shader_parameter/nrm_tex = ExtResource("12")
+shader_parameter/breakup_tex = ExtResource("7")
+shader_parameter/tint = Color(0.950, 0.920, 0.880, 1)
+
+[sub_resource type="ShaderMaterial" id="rock_cliff04_0p90_0p90_0p90"]
+render_priority = 0
+shader = ExtResource("3")
+shader_parameter/albedo_tex = ExtResource("10")
+shader_parameter/arm_tex = ExtResource("11")
+shader_parameter/nrm_tex = ExtResource("12")
+shader_parameter/breakup_tex = ExtResource("7")
+shader_parameter/tint = Color(0.900, 0.900, 0.900, 1)
+
+[sub_resource type="ShaderMaterial" id="rock_rocks05_1p00_1p00_1p00"]
+render_priority = 0
+shader = ExtResource("3")
+shader_parameter/albedo_tex = ExtResource("14")
+shader_parameter/arm_tex = ExtResource("15")
+shader_parameter/nrm_tex = ExtResource("16")
+shader_parameter/breakup_tex = ExtResource("7")
+shader_parameter/tint = Color(1.000, 1.000, 1.000, 1)
+
+[sub_resource type="ShaderMaterial" id="rock_rocks05_0p95_0p92_0p90"]
+render_priority = 0
+shader = ExtResource("3")
+shader_parameter/albedo_tex = ExtResource("14")
+shader_parameter/arm_tex = ExtResource("15")
+shader_parameter/nrm_tex = ExtResource("16")
+shader_parameter/breakup_tex = ExtResource("7")
+shader_parameter/tint = Color(0.950, 0.920, 0.900, 1)
+
+[sub_resource type="ShaderMaterial" id="rock_landrocks02_1p00_1p00_1p00"]
+render_priority = 0
+shader = ExtResource("3")
+shader_parameter/albedo_tex = ExtResource("18")
+shader_parameter/arm_tex = ExtResource("19")
+shader_parameter/nrm_tex = ExtResource("20")
+shader_parameter/breakup_tex = ExtResource("7")
+shader_parameter/tint = Color(1.000, 1.000, 1.000, 1)
+
+[sub_resource type="Gradient" id="spraygrad"]
+offsets = PackedFloat32Array(0, 0.15, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.45, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="spraygradtex"]
+gradient = SubResource("spraygrad")
+
+[sub_resource type="Curve" id="spraycurve"]
+_data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="spraycurvetex"]
+curve = SubResource("spraycurve")
+
+[sub_resource type="ParticleProcessMaterial" id="sprayproc"]
+emission_shape = 3
+emission_box_extents = Vector3(6, 0.4, 2)
+direction = Vector3(0.3, 1, 0.4)
+spread = 25.0
+initial_velocity_min = 2.0
+initial_velocity_max = 5.5
+gravity = Vector3(0, -6, 0)
+damping_min = 0.6
+damping_max = 1.2
+scale_min = 0.8
+scale_max = 2.2
+scale_curve = SubResource("spraycurvetex")
+color_ramp = SubResource("spraygradtex")
+
+[sub_resource type="Gradient" id="puffgrad"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="pufftex"]
+gradient = SubResource("puffgrad")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="spraymat"]
+transparency = 1
+depth_draw_mode = 0
+shading_mode = 2
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.95, 0.93, 0.9, 0.6)
+albedo_texture = SubResource("pufftex")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+proximity_fade_enabled = true
+proximity_fade_distance = 1.5
+
+[sub_resource type="QuadMesh" id="sprayquad"]
+material = SubResource("spraymat")
+size = Vector2(0.9, 0.9)
+
+[node name="Coast" type="Node3D" node_paths=PackedStringArray("sun", "water", "reflection_viewport", "reflection_camera", "camera")]
+script = ExtResource("1")
+sun = NodePath("Sun")
+water = NodePath("Water")
+reflection_viewport = NodePath("Reflection")
+reflection_camera = NodePath("Reflection/ReflectionCamera")
+duration = 7.0
+camera = NodePath("Camera3D")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.86603, 0.00000, 0.50000, 0.02617, 0.99863, 0.04532, -0.49931, 0.05234, -0.86484, 0.00000, 50.00000, 0.00000)
+light_color = Color(1, 0.62, 0.38, 1)
+light_energy = 3.0
+light_specular = 0.6
+light_angular_distance = 1.2
+shadow_enabled = true
+shadow_bias = 0.04
+shadow_normal_bias = 1.5
+directional_shadow_mode = 2
+directional_shadow_max_distance = 700.0
+directional_shadow_split_1 = 0.05
+directional_shadow_split_2 = 0.18
+directional_shadow_split_3 = 0.45
+directional_shadow_blend_splits = true
+volumetric_fog_energy = 1.2
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1.00000, 0.00000, 0.00000, 0.00000, 1.00000, 0.00000, 0.00000, 0.00000, 1.00000, 6.00000, 2.30000, 14.00000)
+fov = 42.0
+near = 0.1
+far = 16000.0
+
+[node name="Water" type="MeshInstance3D" parent="."]
+layers = 2
+cast_shadow = 0
+material_override = SubResource("watermat")
+
+[node name="Reflection" type="SubViewport" parent="."]
+transparent_bg = true
+use_hdr_2d = true
+msaa_3d = 0
+positional_shadow_atlas_size = 0
+size = Vector2i(640, 360)
+render_target_update_mode = 0
+
+[node name="ReflectionCamera" type="Camera3D" parent="Reflection"]
+cull_mask = 1
+environment = SubResource("env_refl")
+fov = 42.0
+near = 0.1
+far = 16000.0
+
+[node name="Rocks" type="Node3D" parent="."]
+
+[node name="CliffMid" type="MeshInstance3D" parent="Rocks"]
+transform = Transform3D(0.62374, 0.00000, 2.93444, 0.00000, 3.00000, 0.00000, -2.93444, 0.00000, 0.62374, 25.00000, -9.00000, -250.00000)
+mesh = ExtResource("9")
+material_override = SubResource("rock_cliff04_0p95_0p92_0p88")
+
+[node name="CliffFar" type="MeshInstance3D" parent="Rocks"]
+transform = Transform3D(4.22862, 0.00000, 1.53909, 0.00000, 4.50000, 0.00000, -1.53909, 0.00000, 4.22862, -150.00000, -8.00000, -950.00000)
+mesh = ExtResource("9")
+material_override = SubResource("rock_cliff04_0p90_0p90_0p90")
+
+[node name="StackMid" type="MeshInstance3D" parent="Rocks"]
+transform = Transform3D(6.06218, 0.00000, 3.50000, 0.00000, 7.00000, 0.00000, -3.50000, 0.00000, 6.06218, 18.00000, -2.00000, -105.00000)
+mesh = ExtResource("13")
+material_override = SubResource("rock_rocks05_1p00_1p00_1p00")
+
+[node name="StackMid2" type="MeshInstance3D" parent="Rocks"]
+transform = Transform3D(-10.27999, -1.14981, -3.74161, -1.08047, 10.93974, -0.39326, 3.76222, 0.00000, -10.33662, 2.00000, -4.00000, -372.00000)
+mesh = ExtResource("13")
+material_override = SubResource("rock_rocks05_0p95_0p92_0p90")
+
+[node name="ReefNear" type="MeshInstance3D" parent="Rocks"]
+transform = Transform3D(-0.92976, 0.00000, 1.99388, 0.00000, 2.20000, 0.00000, -1.99388, 0.00000, -0.92976, 13.00000, -0.90000, -36.00000)
+mesh = ExtResource("17")
+material_override = SubResource("rock_landrocks02_1p00_1p00_1p00")
+
+[node name="BoulderNear" type="MeshInstance3D" parent="Rocks"]
+transform = Transform3D(-1.50351, 0.00000, 0.54723, 0.00000, 1.60000, 0.00000, -0.54723, 0.00000, -1.50351, 8.00000, -1.00000, -14.00000)
+mesh = ExtResource("13")
+material_override = SubResource("rock_rocks05_1p00_1p00_1p00")
+
+[node name="Spray0" type="GPUParticles3D" parent="."]
+transform = Transform3D(1.00000, 0.00000, 0.00000, 0.00000, 1.00000, 0.00000, 0.00000, 0.00000, 1.00000, 16.00000, 0.00000, -100.00000)
+amount = 96
+lifetime = 1.8
+explosiveness = 0.55
+randomness = 0.4
+preprocess = 2.00
+use_fixed_seed = true
+seed = 1234
+fixed_fps = 30
+visibility_aabb = AABB(-12, -4, -8, 24, 20, 16)
+layers = 4
+process_material = SubResource("sprayproc")
+draw_pass_1 = SubResource("sprayquad")
+
+[node name="Spray1" type="GPUParticles3D" parent="."]
+transform = Transform3D(1.00000, 0.00000, 0.00000, 0.00000, 1.00000, 0.00000, 0.00000, 0.00000, 1.00000, 12.00000, 0.00000, -33.00000)
+amount = 96
+lifetime = 1.8
+explosiveness = 0.55
+randomness = 0.4
+preprocess = 2.60
+use_fixed_seed = true
+seed = 1235
+fixed_fps = 30
+visibility_aabb = AABB(-12, -4, -8, 24, 20, 16)
+layers = 4
+process_material = SubResource("sprayproc")
+draw_pass_1 = SubResource("sprayquad")
+
+[node name="Spray2" type="GPUParticles3D" parent="."]
+transform = Transform3D(1.00000, 0.00000, 0.00000, 0.00000, 1.00000, 0.00000, 0.00000, 0.00000, 1.00000, 7.50000, 0.00000, -12.00000)
+amount = 96
+lifetime = 1.8
+explosiveness = 0.55
+randomness = 0.4
+preprocess = 3.30
+use_fixed_seed = true
+seed = 1236
+fixed_fps = 30
+visibility_aabb = AABB(-12, -4, -8, 24, 20, 16)
+layers = 4
+process_material = SubResource("sprayproc")
+draw_pass_1 = SubResource("sprayquad")
