@@ -9,7 +9,9 @@ extends Node
 ## Time is deterministic: under --fixed-fps / --write-movie the clock is frame_index / fps,
 ## and shots are driven only through DemoShot.drive(t).
 ##
-## Command line (after `--` or anywhere):  --perf  perf overlay,  --loop  loop forever.
+## Command line (after `--` or anywhere):  --perf  perf overlay,  --loop  loop forever,
+##   --speed=<f>  timeline speed (0.5 = everything on screen at half speed, same frame rate).
+##   At any speed other than 1 the score is decoupled: it loops at normal speed, unsynced.
 ## Project settings (optional, read if present): demo/perf_overlay, demo/loop.
 
 const SHOTS := [
@@ -34,6 +36,7 @@ var _fixed_fps := 0.0
 var _frame := 0
 var _loop := false
 var _perf := false
+var _speed := 1.0
 
 var _packed: Array = []        # PackedScene per SHOTS entry (or null)
 var _instances: Array = []     # pre-instantiated DemoShot per entry (or null)
@@ -89,6 +92,10 @@ func _parse_args() -> void:
 			_perf = true
 		elif a == "--loop":
 			_loop = true
+		elif a.begins_with("--speed="):
+			var sp := a.trim_prefix("--speed=").to_float()
+			if sp > 0.0:
+				_speed = sp
 	if ProjectSettings.has_setting("demo/perf_overlay"):
 		_perf = _perf or bool(ProjectSettings.get_setting("demo/perf_overlay"))
 	if ProjectSettings.has_setting("demo/loop"):
@@ -158,6 +165,8 @@ func _build_layers() -> void:
 		_audio.stream = load(SCORE)
 	_audio.bus = &"Master"
 	add_child(_audio)
+	if _free_audio():
+		_audio.finished.connect(_audio.play)
 
 
 func _exit_tree() -> void:
@@ -207,7 +216,7 @@ func _start() -> void:
 	_frame = 0
 	_idx = -1
 	_state = State.PLAYING
-	if _audio.stream:
+	if _audio.stream and not (_free_audio() and _audio.playing):
 		_audio.play(0.0)
 
 
@@ -279,12 +288,12 @@ func _process_playing(delta: float) -> void:
 	if _fixed_fps != 0.0:
 		if _fixed_fps < 0.0:
 			_fixed_fps = roundf(1.0 / delta) if delta > 0.0 else 60.0
-		t = _frame / _fixed_fps
+		t = _frame / _fixed_fps * _speed
 		_frame += 1
 	else:
-		t += delta
+		t += delta * _speed
 		# keep the score locked to the picture; resync only on real drift (hitches)
-		if _audio.playing:
+		if _audio.playing and not _free_audio():
 			var at := _audio.get_playback_position() + AudioServer.get_time_since_last_mix()
 			if absf(at - t) > 0.08 and t < END - 0.2:
 				_audio.seek(t)
@@ -298,7 +307,8 @@ func _process_playing(delta: float) -> void:
 			if _fixed_fps != 0.0:
 				_start()
 			else:
-				_audio.stop()
+				if not _free_audio():
+					_audio.stop()
 				_state = State.WARMUP
 				_warm_i = 0
 				_warm_frames = 0
@@ -389,6 +399,11 @@ func _update_transitions() -> void:
 func _set_fade(f: float) -> void:
 	if _post_mat:
 		_post_mat.set_shader_parameter(&"fade", f)
+
+
+## Score runs on its own (looping, normal speed) instead of following the timeline.
+func _free_audio() -> bool:
+	return _speed != 1.0
 
 
 static func _s(x: float) -> float:
